@@ -1,16 +1,17 @@
 import React from 'react';
 import TeamGrid from './components/teamGrid.js'
-import ButtonAppBar from './components/navBar.js'
+import NavBar from './components/navBar.js'
 
 //add hover
 // figure out how many rows/cols
 //add title etc
 
 export default function App() {
+  const [navBarColor,setNavBarColor] = React.useState("blue");
   return (
     <>
-    <ButtonAppBar />
-    <TeamGrid />
+    <NavBar navBarColor={navBarColor}   />
+    <TeamGrid navBarColor={navBarColor} setNavBarColor={setNavBarColor} />
     </>
   );
 }
