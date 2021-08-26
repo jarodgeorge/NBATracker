@@ -13,14 +13,17 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import ReCAPTCHA from "react-google-recaptcha";
 
-
+//https://dev.to/samirasaad/environment-variables-for-a-react-js-app-329j
+//might have to change npm build after this
 
 // https://codesandbox.io/s/0x7mqonlw0?file=/src/CreateUserDialog.js
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
         alignContent: 'center',
+        
 
     },
     dialog: {
@@ -46,6 +49,10 @@ const useStyles = makeStyles((theme) => ({
     },
     form: {
         height: theme.spacing(20),
+    },
+    cancel:{
+        margin: theme.spacing(1),
+        marginRight: theme.spacing(3)
     }
 
 }));
@@ -187,6 +194,10 @@ export default function Popup(props) {
 
     };
     
+    const handleRecaptcha=()=>{
+        return true
+    };
+
     const validate = () =>{
         let temp  = {};
         let parsedNumber = values.phone_number;
@@ -251,7 +262,7 @@ export default function Popup(props) {
                         <Grid item xs={12}>
                             <Typography className={classes.text} id="discrete-slider-custom" gutterBottom align="center">
                                 Don't Text Me After
-                </Typography>
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
                             <Slider className={classes.slider} onChange={handleSliderChange}
@@ -268,28 +279,36 @@ export default function Popup(props) {
                             />
                         </Grid>
 
+                        <Grid item xs={12}  align="right" justifyContent="right">
+                            <ReCAPTCHA sitekey="6Ld53CQcAAAAAEwpSEdlI70CgMuD1eGZxSwthltZ"
+                            onChange={handleRecaptcha}/>
+                        </Grid>
 
+                        <Grid container justifyContent="flex-end">
+                            <Grid align="right" item xs={12}>
+                                <Button className={classes.cancel}
+                                    color="primary"
+                                    // className={this.props.classes.cancelButton}
+                                    // data-cy="cancel-create-user"
+                                    onClick={handleClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                            variant="contained"
+                                            color="primary"
+                                            type="submit"
+                                            onClick ={handleSubmit}
+                                        >
+                                            Submit
+                                </Button>
 
+                            </Grid>
+
+                                    
+                        </Grid>
                     </Grid>
-
-                    <Grid container justify="flex-end">
-                        <Button
-                            color="primary"
-                            // className={this.props.classes.cancelButton}
-                            // data-cy="cancel-create-user"
-                            onClick={handleClose}
-                        >
-                            Cancel
-                </Button>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            type="submit"
-                            onClick ={handleSubmit}
-                        >
-                            Submit
-                </Button>
-                    </Grid>
+                   
                 </form>
             
             </DialogContent>

@@ -17,9 +17,10 @@ client = Client(account_sid, auth_token)
 # for random user agent headers
 ua = UserAgent()
 #https://botproxy.net/pricing
+#get new ones
 proxies = {
-    'http': 'http://pxu25216-0:XfEtgTiKDFsZA1aL8dou@x.botproxy.net:8080',
-    'https': 'http://pxu25216-0:XfEtgTiKDFsZA1aL8dou@x.botproxy.net:8080'
+    'http': '',
+    'https': ''
     }
 
 headers = {

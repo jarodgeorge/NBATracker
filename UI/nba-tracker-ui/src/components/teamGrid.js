@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import CardMedia from '@material-ui/core/CardMedia';
 import { CardActionArea, CardHeader } from '@material-ui/core';
-import logoArr from './logos'
+import logoArr from './nba-logos'
 import Popup from './popup'
 import SnackBar from './snackBar'
 

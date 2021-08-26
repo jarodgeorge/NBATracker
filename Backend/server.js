@@ -56,8 +56,8 @@ app.post("/greeting", async(req,res)=>{
         console.log(error.message);
     }
 })
-
-app.post('remove',(req,res) =>{
+//need to test with actual server hosted
+app.post('/remove',(req,res) =>{
     print(req);
     const twiml = new MessagingResponse();
 
