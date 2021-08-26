@@ -1,2 +1,3 @@
 node_modules/
-Backend/db.js
+Backend/db.js/
+.env.production
