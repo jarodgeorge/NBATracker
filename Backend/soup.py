@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     #establishing the connection
     conn = psycopg2.connect(
-        database="nba_alerts", user='postgres', password='***REMOVED***', host='127.0.0.1', port= '5432')
+        database="nba_alerts", user='postgres', password='jewmuffin1', host='127.0.0.1', port= '5432')
     conn.autocommit = True
     cursor = conn.cursor()
 
