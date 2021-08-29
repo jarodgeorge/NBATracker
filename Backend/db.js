@@ -9,3 +9,4 @@ const pool = new Pool({
 });
 
 module.exports = pool;
+git filter-repo --invert-paths --path E:\Development\nbaTracker\Backend\db.js
