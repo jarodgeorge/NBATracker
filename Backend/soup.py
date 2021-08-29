@@ -6,11 +6,18 @@ import time
 import random
 from fake_useragent import UserAgent
 import psycopg2
+from dotenv import load_dotenv
+
+
+load_dotenv()
+#postgres info
+postgres_password = os.getenv('POSTGRES_PW')
+
 
 #twilio info
-account_sid = os.environ['TWILIO_ACCOUNT_SID']
-auth_token = os.environ['TWILIO_AUTH_TOKEN']
-phone_number = os.environ['TWILIO_PHONE_NUMBER']
+account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+phone_number = os.getenv('TWILIO_PHONE_NUMBER')
 
 client = Client(account_sid, auth_token)
 
@@ -106,7 +113,7 @@ if __name__ == "__main__":
 
     #establishing the connection
     conn = psycopg2.connect(
-        database="nba_alerts", user='postgres', password='jewmuffin1', host='127.0.0.1', port= '5432')
+        database="nba_alerts", user='postgres', password=postgres_password, host='127.0.0.1', port= '5432')
     conn.autocommit = True
     cursor = conn.cursor()
 
