@@ -7,7 +7,6 @@ import CloseIcon from '@material-ui/icons/Close';
 export default function SnackBar(props) {
     const handleCloseSnack = () => {
         props.onCloseSnack();
-        console.log(props.openSnack);
         
     }
     return (

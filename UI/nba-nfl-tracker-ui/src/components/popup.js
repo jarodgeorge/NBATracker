@@ -1,4 +1,4 @@
-import React from 'react'
+import {useState, useRef} from 'react'
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import { DialogContent } from '@material-ui/core';
@@ -15,19 +15,28 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import ReCAPTCHA from "react-google-recaptcha";
 
+
 //https://dev.to/samirasaad/environment-variables-for-a-react-js-app-329j
 //might have to change npm build after this
 
 // https://codesandbox.io/s/0x7mqonlw0?file=/src/CreateUserDialog.js
+const dotenv = require('dotenv');
+const {REACT_APP_RECAPTCHA_KEY, REACT_APP_VERIFY_URL,REACT_APP_ALERTS_URL, REACT_APP_GREETING_URL} = process.env;
+
+
+
+
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
         alignContent: 'center',
         
+        
 
     },
     dialog: {
         margin: 10,
+        
 
     },
     number: {
@@ -35,9 +44,11 @@ const useStyles = makeStyles((theme) => ({
     },
     team: {
         height: theme.spacing(5),
+        fontSize: "1.3em"
     },
     title: {
         height: theme.spacing(3),
+        
     },
     text: {
         height: theme.spacing(5),
@@ -45,6 +56,7 @@ const useStyles = makeStyles((theme) => ({
     slider: {
         height: theme.spacing(5),
         margin: 2,
+        
 
     },
     form: {
@@ -53,6 +65,9 @@ const useStyles = makeStyles((theme) => ({
     cancel:{
         margin: theme.spacing(1),
         marginRight: theme.spacing(3)
+    },
+    recaptchaErrorText:{
+        color:"#ff0000"
     }
 
 }));
@@ -103,6 +118,7 @@ export default function Popup(props) {
     //form validation
     //re structure code, creatre reusable components + clean up
     // backend
+    const reRef = useRef();
     let timeMap ={};
     marks.forEach(time =>{
         timeMap[time.value]=time.label;
@@ -110,11 +126,14 @@ export default function Popup(props) {
 
     const classes = useStyles();
     const { onClose, selectedTeam, open, onOpenSnack } = props;
-    const [values, setValues] = React.useState({...initialFormValues});
-    const [errors, setErrors] = React.useState({});
+    const [values, setValues] = useState({...initialFormValues});
+    const [errors, setErrors] = useState({});
+    const [captcha,setCaptcha] = useState();
     
 
     const handleClose = () => {
+        setErrors({})
+
         setValues({
             ...initialFormValues
         })
@@ -134,34 +153,31 @@ export default function Popup(props) {
     const handleSubmit = async (event) => {
         //add push notification as well
         event.preventDefault();
-        if(validate()){
+        const hasPassed = await validate();
+        if(hasPassed){
             try{
-                const response = fetch('http://localhost:5000/alerts/', {
+                const alertResponse = fetch(REACT_APP_ALERTS_URL, {
                     method:"POST",
                     headers: { "Content-Type": "application/json"},
                     body: JSON.stringify(values)
-                })
-            } catch(err){
-                console.error(err.message);
-            }
-            
-            try{
-                const response = fetch('http://localhost:5000/greeting/',{
+                });
+
+                const greetingResponse = fetch(REACT_APP_GREETING_URL,{
                     method:"POST",
                     headers: {"Content-Type": "application/json"},
                     body:JSON.stringify(values)
-                })
-            }catch(err){
+                });
+                const openSnack =  Promise.all([alertResponse,greetingResponse]);
+                openSnack.then(onOpenSnack(selectedTeam));
+            } catch(err){
                 console.error(err.message);
             }
-
-
-            onOpenSnack(selectedTeam);
-
+        
+            
             setValues({
                 ...initialFormValues
             })
-
+            setErrors({})
             onClose();
         }
         
@@ -194,17 +210,30 @@ export default function Popup(props) {
 
     };
     
-    const handleRecaptcha=()=>{
+    const handleRecaptcha=(value)=>{
+        setCaptcha(value);
         return true
     };
 
-    const validate = () =>{
+    const validate = async () =>{
+
+
+        const verifyToken = await fetch(REACT_APP_VERIFY_URL, {
+            method:"POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({token:captcha})
+        });
+
+        const response = await verifyToken.json();
         let temp  = {};
         let parsedNumber = values.phone_number;
         parsedNumber = parsedNumber.replace(/\s+/g, "");
         parsedNumber = parsedNumber.replace(/[&\/\\#,+()$~%.'":*?<>{}-]/g, '');
         temp.phone_number = parsedNumber.length>7 ? "" : "Please enter a valid phone number";
-
+        temp.recaptcha = response.success ? "":response.msg;
+        
+        reRef.current.reset();
+        setCaptcha("");
         
         setErrors({
             ...temp
@@ -226,7 +255,7 @@ export default function Popup(props) {
                     {selectedTeam}
                 </Typography>
                 <Typography className={classes.title}>
-                    Enter your phone number to reminded on future NBA games
+                    Enter your phone number to be reminded of future games
                 </Typography>
             </DialogTitle>
             <DialogContent className={classes.dialog}>
@@ -261,7 +290,7 @@ export default function Popup(props) {
 
                         <Grid item xs={12}>
                             <Typography className={classes.text} id="discrete-slider-custom" gutterBottom align="center">
-                                Don't Text Me After
+                                Text Me Before
                             </Typography>
                         </Grid>
                         <Grid item xs={12}>
@@ -279,12 +308,17 @@ export default function Popup(props) {
                             />
                         </Grid>
 
-                        <Grid item xs={12}  align="right" justifyContent="right">
-                            <ReCAPTCHA sitekey="6Ld53CQcAAAAAEwpSEdlI70CgMuD1eGZxSwthltZ"
+                        <Grid item xs={12}  align="right" justifycontent="right">
+                            <ReCAPTCHA 
+                            sitekey={REACT_APP_RECAPTCHA_KEY}
+                            ref={reRef}
                             onChange={handleRecaptcha}/>
+                            <Typography className={classes.recaptchaErrorText}>
+                                {errors.recaptcha}
+                            </Typography>
                         </Grid>
-
-                        <Grid container justifyContent="flex-end">
+                        
+                        <Grid container justifycontent="flex-end">
                             <Grid align="right" item xs={12}>
                                 <Button className={classes.cancel}
                                     color="primary"

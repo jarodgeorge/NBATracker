@@ -1,5 +1,5 @@
 https://www.youtube.com/watch?v=ldYcgPKEZC8&t=1958s&ab_channel=freeCodeCamp.org
-CREATE DATABASE nba_alerts;
+CREATE DATABASE sports_alerts;
 
 
 CREATE TABLE alerts(
