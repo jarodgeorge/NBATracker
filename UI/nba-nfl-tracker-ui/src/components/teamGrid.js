@@ -36,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     overflow:"hidden"
 
+  },
+  teamGrid:{
+    // paddingTop: '105px'
+    marginTop: '75px'
   }
 }));
 
@@ -118,7 +122,7 @@ export default function TeamGrid(props) {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={0}>
+      <Grid container spacing={0} className={classes.teamGrid}>
         <Grid container item xs={12} spacing={3}>
           {props.league==="NFL" ? allNflTeams : allNbaTeams}
         </Grid>
