@@ -48,7 +48,7 @@ app.post("/greeting", async(req,res)=>{
             from: twilio_phone_number,
             to: phone_number
         })
-        .then(message => console.log(message.sid));
+        .then(message => console.log(message.sid)).catch(e => { console.error('Got an error:', e.code, e.message); });;
 
         res.sendStatus(200).end();
 

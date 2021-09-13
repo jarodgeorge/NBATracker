@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 import time
 import random
 from fake_useragent import UserAgent
@@ -31,10 +32,11 @@ client = Client(account_sid, auth_token)
 ua = UserAgent()
 # https://botproxy.net/pricing
 # get new ones
-proxies = {
-    'http': '',
-    'https': ''
+proxies={
+    'http': 'http://pxu25216-0:XfEtgTiKDFsZA1aL8dou@x.botproxy.net:8080',
+    'https': 'http://pxu25216-0:XfEtgTiKDFsZA1aL8dou@x.botproxy.net:8080'
 }
+
 
 headers = {
     'Access-Control-Allow-Origin': '*',
@@ -50,20 +52,25 @@ nba_teams = ["76ers", "Bucks", "Bulls", "Cavaliers", "Celtics", "Clippers", "Gri
 
 nfl_teams = ["49ers", "Bears", "Bengals", "Bills", "Broncos", "Browns",	"Buccaneers", "Cardinals", "Chargers", "Chiefs", "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons",
             "Football Team", "Giants", "Jaguars", "Jets", "Lions", "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Saints", "Seahawks", "Steelers", "Texans", "Titans", "Vikings"]
-all_teams =nba_teams+nfl_teams
+# all_teams =nba_teams+nfl_teams
+# all_teams=["Patriots"]
+all_teams = nfl_teams
 
 
 
 # twilio text functionality
 def sendText(teamName, phoneNumber, gameTime):
-    message = client.messages \
-        .create(
-            body=teamName+" are live. " + gameTime,
-            from_=twilio_phone_number,
-            to=phoneNumber
-        )
+    try:
+        message = client.messages \
+            .create(
+                body=teamName+" are live. " + gameTime,
+                from_=twilio_phone_number,
+                to=phoneNumber
+            )
 
-    print(message.sid)
+        print(message.sid)
+    except TwilioRestException as e:
+        print(e)
 
 # web scrapping call
 
@@ -71,9 +78,9 @@ def sendText(teamName, phoneNumber, gameTime):
 def gameStatus(teamName,league):
     url = "https://www.google.com/search?q=" + teamName + " "+league + " "+ "score"
         
-    
-    # req = requests.get(url, headers=headers,proxies=proxies) turn on once you pay for a proxy
-    req = requests.get(url, headers=headers)
+    #run if proxyies are valid
+    req = requests.get(url, headers=headers,proxies=proxies) 
+    # req = requests.get(url, headers=headers)
     soup = BeautifulSoup(req.content, 'html.parser')
     with open("soupTest.html", "w", encoding="utf-8") as file:
         file.write(str(soup.prettify()))
@@ -138,20 +145,23 @@ if __name__ == "__main__":
             time.sleep(1000)
         else:
             for teamName in all_teams:
-                print(teamName)
+                print("Team name {0}".format(teamName))
                 league = "NFL" if teamName in nfl_teams else "NBA"
-                # isGameLive = gameStatus(teamName,league)
-                isGameLive ="Q1 3:59"
+                isGameLive = gameStatus(teamName,league)
+                
+                print("Game status {0}".format(isGameLive))
+                # isGameLive ="Q1 3:59"
                 time.sleep(random.randint(3, 30))
-                if isGameLive == "Halftime" or "Q1" in isGameLive:
+                if isGameLive and (isGameLive == "Halftime" or "Q1" in isGameLive):
                     if isGameLive == "Halftime":
                          cursor.execute(
-                        '''SELECT * from alerts WHERE team_name=%s AND is_active =true AND (alert_category='All Game Halftimes' OR alert_category='When the Game is Good' ''',[teamName])
+                        '''SELECT * from alerts WHERE team_name=%s AND is_active=true AND (alert_category='All Game Halftimes' OR alert_category='When the Game is Good') ''',[teamName])
                     elif "Q1" in isGameLive:
                         cursor.execute(
                             '''SELECT * from alerts WHERE team_name=%s AND is_active=true AND alert_category='All Game Starts' ''',[teamName])
 
                     result = cursor.fetchall()
+                    print("DB result: ")
                     print(result)
                     for res in result:
                         currentTeam = res[3]
