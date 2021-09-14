@@ -22,7 +22,9 @@ import ReCAPTCHA from "react-google-recaptcha";
 // https://codesandbox.io/s/0x7mqonlw0?file=/src/CreateUserDialog.js
 const dotenv = require('dotenv');
 const {REACT_APP_RECAPTCHA_KEY, REACT_APP_VERIFY_URL,REACT_APP_ALERTS_URL, REACT_APP_GREETING_URL} = process.env;
-
+console.log(REACT_APP_VERIFY_URL);
+console.log(REACT_APP_ALERTS_URL);
+console.log(REACT_APP_GREETING_URL);
 
 
 
