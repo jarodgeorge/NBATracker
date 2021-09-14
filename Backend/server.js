@@ -15,9 +15,7 @@ const nflTeams = ["49ers", "Bears", "Bengals", "Bills", "Broncos", "Browns",	"Bu
   "Football Team", "Giants", "Jaguars", "Jets", "Lions", "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Saints", "Seahawks", "Steelers", "Texans", "Titans", "Vikings"]
 
 
-
 //ROUTES//
-// https://www.youtube.com/watch?v=ldYcgPKEZC8&t=1310s&ab_channel=CodingEntrepreneursCodingEntrepreneursVerified
 
 // Create Alert
 app.post("/alerts", async(req,res) =>{
@@ -66,27 +64,32 @@ app.post("/greeting", async(req,res)=>{
 // add logic to avoid spammers
 app.post('/remove', urlencodedParser, async (req,res) =>{
     const phone_number = req.body.From;
-    const text = req.body.Body;
-    const team_name = "";
+    let text = req.body.Body;
+    let splitText = text.split(" ");
+    console.log(splitText);
+    console.log(text);
+    console.log(nbaTeams.includes("Clippers"));
+    let team_name = "";
     const parsed_phone_number = parseNumber(phone_number);
-    for(word in text){
-        if (nbaTeams.includes(word) || nflTeams.includes(word)){
-            team_name = word;
+    for(let i = 0; i<splitText.length;i++){
+        if (nbaTeams.includes(element) || nflTeams.includes(element)){
+            console.log(element);
+            team_name = element;
             break;
         }
     }
+
+    console.log(team_name);
     //add call to remove from db
     // console.log(req);
     const twiml = new MessagingResponse();
     const removeAlert = await pool.query("DELETE FROM alerts WHERE phone_number = $1 AND team_name = $2",[parsed_phone_number,team_name])
     console.log(removeAlert);
     twiml.message("Your alerts for this team have been removed.");
-
     res.writeHead(200,{'Content-Type':'text/xml'});
     res.end(twiml.toString());
 })
-//add recaptcha functionality
-//https://www.youtube.com/watch?v=UzCkSzmEq8E&ab_channel=TraversyMedia
+
 
 app.post('/verify', async (req, res) => {
     if (
