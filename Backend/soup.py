@@ -150,7 +150,6 @@ if __name__ == "__main__":
                 isGameLive = gameStatus(teamName,league)
                 
                 print("Game status {0}".format(isGameLive))
-                # isGameLive ="Q1 3:59"
                 time.sleep(random.randint(3, 30))
                 if isGameLive and (isGameLive == "Halftime" or "Q1" in isGameLive):
                     if isGameLive == "Halftime":

@@ -9,11 +9,13 @@ const fetch = require("node-fetch");
 
 app.use(cors());
 app.use(express.json());
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
-const nbaTeams = ["76ers", "bucks", "bulls", "cavaliers", "celtics", "clippers", "grizzlies", "hawks", "heat", "hornets", "jazz", "kings", "knicks", "lakers", "magic", "mavericks", "nets", "nuggets", "pacers", "pelicans", "pistons", "raptors", "rockets", "spurs", "suns", "thunder", "timberwolves", "trail blazers", "warriors", "wizards"];																									
-const nflTeams = ["49ers", "bears", "bengals", "bills", "broncos", "browns", "buccaneers", "cardinals", "chargers", "chiefs", "colts", "cowboys", "dolphins", "eagles", "falcons","football team", "giants", "jaguars", "jets", "lions", "packers", "panthers", "patriots", "raiders", "rams", "ravens", "saints", "seahawks", "steelers", "texans", "titans", "vikings"];																									]																									
-//ROUTES//
+app.use(express.urlencoded({
+    extended: true
+  }));
 
+const nbaTeams = ["76ers", "bucks", "bulls", "cavaliers", "celtics", "clippers", "grizzlies", "hawks", "heat", "hornets", "jazz", "kings", "knicks", "lakers", "magic", "mavericks", "nets", "nuggets", "pacers", "pelicans", "pistons", "raptors", "rockets", "spurs", "suns", "thunder", "timberwolves", "trail blazers", "warriors", "wizards"];																									
+const nflTeams = ["49ers", "bears", "bengals", "bills", "broncos", "browns", "buccaneers", "cardinals", "chargers", "chiefs", "colts", "cowboys", "dolphins", "eagles", "falcons","football team", "giants", "jaguars", "jets", "lions", "packers", "panthers", "patriots", "raiders", "rams", "ravens", "saints", "seahawks", "steelers", "texans", "titans", "vikings"];																																																	
+//ROUTES//
 // Create Alert
 app.post("/alerts", async(req,res) =>{
     try {
@@ -40,7 +42,7 @@ app.post("/greeting", async(req,res)=>{
         const authToken = process.env.TWILIO_AUTH_TOKEN;
         const twilio_phone_number = process.env.TWILIO_PHONE_NUMBER;
         const client = require('twilio')(accountSid, authToken);
-        const message = "You will now recieve game updates for the "+team_name+"\n\n\n"+"Reply remove "+ team_name + " to unsubscribe from this team."+"\n"+ "Reply STOP to unsubscribe from all teams.";
+        const message = "You will now recieve game updates for the "+team_name+"\n\n\n"+"Reply 'remove "+ team_name + "' to unsubscribe from this team."+"\n"+ "Reply STOP to unsubscribe from all teams.";
 
         client.messages
         .create({
@@ -59,12 +61,12 @@ app.post("/greeting", async(req,res)=>{
 
 // add logic to avoid spammers
 // Remove alerts from a team
-app.post('/remove', urlencodedParser, async (req,res) =>{
+app.post('/remove', async (req,res) =>{
     const phone_number = req.body.From;
     let text = req.body.Body;
     let splitText = text.split(" ");
-
     let team_name = "";
+
     const parsed_phone_number = parseNumber(phone_number);
     for(let i = 0; i<splitText.length;i++){
         if (nbaTeams.includes(splitText[i].toLowerCase()) || nflTeams.includes(splitText[i].toLowerCase())){
