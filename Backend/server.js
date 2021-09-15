@@ -10,11 +10,8 @@ const fetch = require("node-fetch");
 app.use(cors());
 app.use(express.json());
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-const nbaTeams = ["76ers", "Bucks", "Bulls", "Cavaliers", "Celtics", "Clippers", "Grizzlies", "Hawks", "Heat", "Hornets", "Jazz", "Kings", "Knicks", "Lakers", "Magic", "Mavericks", "Nets", "Nuggets", "Pacers", "Pelicans", "Pistons", "Raptors", "Rockets", "Spurs", "Suns", "Thunder", "Timberwolves", "Trail Blazers", "Warriors", "Wizards"];
-const nflTeams = ["49ers", "Bears", "Bengals", "Bills", "Broncos", "Browns",	"Buccaneers", "Cardinals", "Chargers", "Chiefs", "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons",
-  "Football Team", "Giants", "Jaguars", "Jets", "Lions", "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Saints", "Seahawks", "Steelers", "Texans", "Titans", "Vikings"]
-
-
+const nbaTeams = ["76ers", "bucks", "bulls", "cavaliers", "celtics", "clippers", "grizzlies", "hawks", "heat", "hornets", "jazz", "kings", "knicks", "lakers", "magic", "mavericks", "nets", "nuggets", "pacers", "pelicans", "pistons", "raptors", "rockets", "spurs", "suns", "thunder", "timberwolves", "trail blazers", "warriors", "wizards"];																									
+const nflTeams = ["49ers", "bears", "bengals", "bills", "broncos", "browns", "buccaneers", "cardinals", "chargers", "chiefs", "colts", "cowboys", "dolphins", "eagles", "falcons","football team", "giants", "jaguars", "jets", "lions", "packers", "panthers", "patriots", "raiders", "rams", "ravens", "saints", "seahawks", "steelers", "texans", "titans", "vikings"];																									]																									
 //ROUTES//
 
 // Create Alert
@@ -43,7 +40,7 @@ app.post("/greeting", async(req,res)=>{
         const authToken = process.env.TWILIO_AUTH_TOKEN;
         const twilio_phone_number = process.env.TWILIO_PHONE_NUMBER;
         const client = require('twilio')(accountSid, authToken);
-        const message = "You will now recieve game updates for the "+team_name+"\n\n\n"+"Reply REMOVE "+ team_name + "to unsubscribe from this team."+"\n"+ "Reply STOP to unsubscribe from all teams.";
+        const message = "You will now recieve game updates for the "+team_name+"\n\n\n"+"Reply remove "+ team_name + " to unsubscribe from this team."+"\n"+ "Reply STOP to unsubscribe from all teams.";
 
         client.messages
         .create({
@@ -59,38 +56,37 @@ app.post("/greeting", async(req,res)=>{
         console.log(error.message);
     }
 })
-//need to test with actual server hosted 
-// to remove team by team? request that in the payload?
+
 // add logic to avoid spammers
+// Remove alerts from a team
 app.post('/remove', urlencodedParser, async (req,res) =>{
     const phone_number = req.body.From;
     let text = req.body.Body;
     let splitText = text.split(" ");
-    console.log(splitText);
-    console.log(text);
-    console.log(nbaTeams.includes("Clippers"));
+
     let team_name = "";
     const parsed_phone_number = parseNumber(phone_number);
     for(let i = 0; i<splitText.length;i++){
-        if (nbaTeams.includes(element) || nflTeams.includes(element)){
-            console.log(element);
-            team_name = element;
+        if (nbaTeams.includes(splitText[i].toLowerCase()) || nflTeams.includes(splitText[i].toLowerCase())){
+            console.log(splitText[i]);
+            team_name = splitText[i];
             break;
         }
     }
 
-    console.log(team_name);
-    //add call to remove from db
-    // console.log(req);
     const twiml = new MessagingResponse();
-    const removeAlert = await pool.query("DELETE FROM alerts WHERE phone_number = $1 AND team_name = $2",[parsed_phone_number,team_name])
-    console.log(removeAlert);
-    twiml.message("Your alerts for this team have been removed.");
+    if (team_name != ""){
+        const removeAlert = await pool.query("DELETE FROM alerts WHERE phone_number = $1 AND team_name = $2",[parsed_phone_number,team_name])
+        twiml.message("Your alerts for the " + team_name + " have been removed.");
+    }
+    else{
+        twiml.message("Invalid team name");
+    }
     res.writeHead(200,{'Content-Type':'text/xml'});
     res.end(twiml.toString());
 })
 
-
+// Verify recaptcha token
 app.post('/verify', async (req, res) => {
     if (
         req.body.token === undefined || req.body.token === "" || req.body.token === null
@@ -122,7 +118,7 @@ app.post('/verify', async (req, res) => {
 
 })
 
-// Delete Alert
+
 app.listen(port, () =>{
     console.log("Server has started on port "+ port);
 })

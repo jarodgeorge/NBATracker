@@ -16,18 +16,9 @@ import FormLabel from '@material-ui/core/FormLabel';
 import ReCAPTCHA from "react-google-recaptcha";
 
 
-//https://dev.to/samirasaad/environment-variables-for-a-react-js-app-329j
-//might have to change npm build after this
 
-// https://codesandbox.io/s/0x7mqonlw0?file=/src/CreateUserDialog.js
 const dotenv = require('dotenv');
 const {REACT_APP_RECAPTCHA_KEY, REACT_APP_VERIFY_URL,REACT_APP_ALERTS_URL, REACT_APP_GREETING_URL} = process.env;
-console.log(REACT_APP_VERIFY_URL);
-console.log(REACT_APP_ALERTS_URL);
-console.log(REACT_APP_GREETING_URL);
-
-
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -119,9 +110,6 @@ const initialFormValues = {
 }
 
 export default function Popup(props) {
-    //form validation
-    //re structure code, creatre reusable components + clean up
-    // backend
     const reRef = useRef();
     let timeMap ={};
     marks.forEach(time =>{
@@ -155,7 +143,6 @@ export default function Popup(props) {
     };
 
     const handleSubmit = async (event) => {
-        //add push notification as well
         event.preventDefault();
         const hasPassed = await validate();
         if(hasPassed){
@@ -220,8 +207,6 @@ export default function Popup(props) {
     };
 
     const validate = async () =>{
-
-
         const verifyToken = await fetch(REACT_APP_VERIFY_URL, {
             method:"POST",
             headers: { "Content-Type": "application/json"},
@@ -251,8 +236,6 @@ export default function Popup(props) {
 
     return (
         //change title to have styling
-        //map time restriction to text
-        //submit to db?
         <Dialog className={classes.dialog} onClose={handleClose} open={open}>
             <DialogTitle>
                 <Typography className={classes.team} align="center">
