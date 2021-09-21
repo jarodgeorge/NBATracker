@@ -42,7 +42,7 @@ app.post("/greeting", async(req,res)=>{
         const authToken = process.env.TWILIO_AUTH_TOKEN;
         const twilio_phone_number = process.env.TWILIO_PHONE_NUMBER;
         const client = require('twilio')(accountSid, authToken);
-        const message = "You will now recieve game updates for the "+team_name+"\n\n\n"+"Reply 'remove "+ team_name + "' to unsubscribe from this team."+"\n"+ "Reply STOP to unsubscribe from all teams.";
+        const message = "You will now recieve game updates for the "+team_name+"\n\n\n"+"Reply 'Remove "+ team_name + "' to unsubscribe from this team."+"\n"+ "Reply STOP to unsubscribe from all teams.";
 
         client.messages
         .create({

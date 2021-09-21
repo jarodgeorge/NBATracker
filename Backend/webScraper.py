@@ -51,7 +51,7 @@ nba_teams = ["76ers", "Bucks", "Bulls", "Cavaliers", "Celtics", "Clippers", "Gri
              "Mavericks", "Nets", "Nuggets", "Pacers", "Pelicans", "Pistons", "Raptors", "Rockets", "Spurs", "Suns", "Thunder", "Timberwolves", "Trail Blazers", "Warriors", "Wizards"]
 
 nfl_teams = ["49ers", "Bears", "Bengals", "Bills", "Broncos", "Browns",	"Buccaneers", "Cardinals", "Chargers", "Chiefs", "Colts", "Cowboys", "Dolphins", "Eagles", "Falcons",
-            "Football Team", "Giants", "Jaguars", "Jets", "Lions", "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Saints", "Seahawks", "Steelers", "Texans", "Titans", "Vikings"]
+            "Washington Football Team", "Giants", "Jaguars", "Jets", "Lions", "Packers", "Panthers", "Patriots", "Raiders", "Rams", "Ravens", "Saints", "Seahawks", "Steelers", "Texans", "Titans", "Vikings"]
 # all_teams =nba_teams+nfl_teams
 # all_teams=["Patriots"]
 all_teams = nfl_teams
@@ -131,10 +131,10 @@ if __name__ == "__main__":
     #app time is EST based, currentTime is UTC based, adjust accordingly
     #change durring daylight savings time
     timeMap = {"12pm":24,"11pm":23, "10pm":22, "9pm":21,"8pm":20}
-    currentTime = datetime.now(timezone.utc)
-    offHours = (currentTime.hour >= 5 and currentTime.hour <= 15 )
     reset = False
     while True:
+        currentTime = datetime.now(timezone.utc)
+        offHours = (currentTime.hour >= 5 and currentTime.hour <= 15 )
         if not offHours and not reset:
             cursor.execute(
                 '''UPDATE alerts SET is_active = true''')
@@ -145,12 +145,12 @@ if __name__ == "__main__":
             time.sleep(1000)
         else:
             for teamName in all_teams:
-                print("Team name {0}".format(teamName))
+                print("{0} Team name {1}".format(currentTime,teamName))
                 league = "NFL" if teamName in nfl_teams else "NBA"
                 isGameLive = gameStatus(teamName,league)
                 
                 print("Game status {0}".format(isGameLive))
-                time.sleep(random.randint(3, 30))
+                time.sleep(random.randint(3, 10))
                 if isGameLive and (isGameLive == "Halftime" or "Q1" in isGameLive):
                     if isGameLive == "Halftime":
                          cursor.execute(
@@ -166,6 +166,7 @@ if __name__ == "__main__":
                         currentTeam = res[3]
                         currentPhone = res[2]
                         currentActive = res[5]
+                        print(currentActive)
                         currentTimeRestriction = res[4]
                         if currentTimeRestriction !="Anytime":
                             # currentTimeRestriction = int("".join(c for c in currentTimeRestriction if c not in 'pma'))
